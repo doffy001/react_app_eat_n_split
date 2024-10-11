@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Children, useState } from 'react';
 
 const initialFriends = [
   {
@@ -21,32 +21,60 @@ const initialFriends = [
   },
 ];
 
+function Button({ children, onClick }) {
+  return (
+    <button className="button" onClick={onClick}>
+      {children}
+    </button>
+  );
+}
+
 function App() {
   const [friends, setFriends] = useState(initialFriends);
+  const [isOpenFormAddFriend, setIsOpenFormAddFriend] = useState(false);
   return (
     <div className="app">
       <div className="sidebar">
-      <Friends friends={friends} />
-      <FormAddFriend />
-    </div>
+        <Friends friends={friends} />
+        {isOpenFormAddFriend && <FormAddFriend />}
+        <Button onClick={() => setIsOpenFormAddFriend(!isOpenFormAddFriend)}>
+          {isOpenFormAddFriend ? 'Close' : 'Add friend'}
+        </Button>
+      </div>
       <FormSplitBill />
     </div>
   );
 }
 
-function Friends({friends}) {
-  return <ul>
-    {friends.map(friend => {
-      return <li>
-        <img src={friend.image} alt={friend.name} />
-        <h3>{friend.name}</h3>
-        {friend.balance < 0 && <p class="red">You own ? $?</p>}
-        {friend.balance > 0 && <p class="green">? owns you $?</p>}
-        {friend.balance === 0 && <p>You and ? are even</p>}
-        <button className="button">Select</button>
-      </li>
-    })}
-  </ul>;
+function Friends({ friends }) {
+  return (
+    <ul>
+      {friends.map((friend) => {
+        return <Friend friend={friend} />;
+      })}
+    </ul>
+  );
+}
+
+function Friend({ friend }) {
+  return (
+    <li className="selected">
+      <img src={friend.image} alt={friend.name} />
+      <h3>{friend.name}</h3>
+      {friend.balance < 0 && (
+        <p class="red">
+          You own {friend.name} ${Math.abs(friend.balance)}
+        </p>
+      )}
+      {friend.balance > 0 && (
+        <p class="green">
+          {friend.name} owns you ${friend.balance}
+        </p>
+      )}
+      {friend.balance === 0 && <p>You and {friend.name} are even</p>}
+      <Button>Select</Button>
+    </li>
+  );
 }
 
 function FormAddFriend() {
@@ -56,26 +84,29 @@ function FormAddFriend() {
       <input type="text" />
       <label>📷 Image URL</label>
       <input type="url" />
+      <Button>Add</Button>
     </form>
   );
 }
 
 function FormSplitBill() {
-  return <form className="form-split-bill">
-    <h2>Split the bill with ?</h2>
-    <label>💰 Bill value</label>
-    <input type="number" />
-    <label>🧍‍♂️ Your expense</label>
-    <input type="number" />
-    <label>👭 ?'s expense</label>
-    <input type="number" disabled />
-    <label>👭 Who is paying the bill?</label>
-    <select>
-      <option>You</option>
-      <option>?</option>
-    </select>
-    <button className="button">Split bill</button>
-  </form>;
+  return (
+    <form className="form-split-bill">
+      <h2>Split the bill with ?</h2>
+      <label>💰 Bill value</label>
+      <input type="number" />
+      <label>🧍‍♂️ Your expense</label>
+      <input type="number" />
+      <label>👭 ?'s expense</label>
+      <input type="number" disabled />
+      <label>👭 Who is paying the bill?</label>
+      <select>
+        <option>You</option>
+        <option>?</option>
+      </select>
+      <Button>Split bill</Button>
+    </form>
+  );
 }
 
 export default App;
