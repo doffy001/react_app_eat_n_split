@@ -38,12 +38,25 @@ function App() {
   )?.name;
 
   function handleToggleFormSplitBill(id) {
-    setFormSplitBillId((currentId) => (currentId === id ? null : id));
+    setFormSplitBillId((currentId) => {
+      if (currentId === id) return null;
+      setIsOpenFormAddFriend(false);
+      return id;
+    });
   }
 
   function handleAddFriend(newFriend) {
-    setFriends(currentFriends => [...currentFriends, newFriend]);
+    setFriends((currentFriends) => [...currentFriends, newFriend]);
     setIsOpenFormAddFriend(false);
+  }
+
+  function handleToggleFormAddFriend() {
+    setIsOpenFormAddFriend((isOpen) => {
+      if (!isOpen) {
+        setFormSplitBillId(null);
+      }
+      return !isOpen;
+    });
   }
 
   return (
@@ -54,10 +67,8 @@ function App() {
           formSplitBillId={formSplitBillId}
           onToggleFormSplitBill={handleToggleFormSplitBill}
         />
-        {isOpenFormAddFriend && (
-          <FormAddFriend onAddFriend={handleAddFriend} />
-        )}
-        <Button onClick={() => setIsOpenFormAddFriend(!isOpenFormAddFriend)}>
+        {isOpenFormAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
+        <Button onClick={handleToggleFormAddFriend}>
           {isOpenFormAddFriend ? 'Close' : 'Add friend'}
         </Button>
       </div>
@@ -87,7 +98,7 @@ function Friends({ friends, formSplitBillId, onToggleFormSplitBill }) {
 
 function Friend({ friend, formSplitBillId, onToggleFormSplitBill }) {
   return (
-    <li className="selected">
+    <li className={formSplitBillId === friend.id ? 'selected' : undefined}>
       <img src={friend.image} alt={friend.name} />
       <h3>{friend.name}</h3>
       {friend.balance < 0 && (
@@ -149,7 +160,7 @@ function FormSplitBill({ currentFriendName }) {
   const yourFriendExpense = totalBill && yourExpense && totalBill - yourExpense;
   return (
     <form className="form-split-bill">
-      <h2>Split the bill with ?</h2>
+      <h2>Split the bill with {currentFriendName}</h2>
       <label>💰 Total bill value</label>
       <input
         type="number"
