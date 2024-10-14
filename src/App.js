@@ -199,7 +199,13 @@ function FormSplitBill({ friends, currentFriendId, onUpdateBalance }) {
         type="number"
         min="0"
         value={yourExpense}
-        onChange={(e) => setYourExpense(Number(e.target.value) > totalBill ? yourExpense : Number(e.target.value))}
+        onChange={(e) =>
+          setYourExpense(
+            Number(e.target.value) > totalBill
+              ? yourExpense
+              : Number(e.target.value)
+          )
+        }
       />
       <label>👭 {currentFriend.name}'s expense</label>
       <input type="number" disabled value={yourFriendExpense} />
