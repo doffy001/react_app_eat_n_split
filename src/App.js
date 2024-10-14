@@ -190,12 +190,14 @@ function FormSplitBill({ friends, currentFriendId, onUpdateBalance }) {
       <label>💰 Total bill value</label>
       <input
         type="number"
+        min="0"
         value={totalBill}
         onChange={(e) => setTotalBill(Number(e.target.value))}
       />
       <label>🧍‍♂️ Your expense</label>
       <input
         type="number"
+        min="0"
         value={yourExpense}
         onChange={(e) => setYourExpense(Number(e.target.value))}
       />
