@@ -33,10 +33,17 @@ function App() {
   const [friends, setFriends] = useState(initialFriends);
   const [isOpenFormAddFriend, setIsOpenFormAddFriend] = useState(false);
   const [formSplitBillId, setFormSplitBillId] = useState(null);
-  const currentFriendName = friends.find((friend) => friend.id === formSplitBillId)?.name;
+  const currentFriendName = friends.find(
+    (friend) => friend.id === formSplitBillId
+  )?.name;
 
   function handleToggleFormSplitBill(id) {
     setFormSplitBillId((currentId) => (currentId === id ? null : id));
+  }
+
+  function handleAddFriend(newFriend) {
+    setFriends(currentFriends => [...currentFriends, newFriend]);
+    setIsOpenFormAddFriend(false);
   }
 
   return (
@@ -47,12 +54,16 @@ function App() {
           formSplitBillId={formSplitBillId}
           onToggleFormSplitBill={handleToggleFormSplitBill}
         />
-        {isOpenFormAddFriend && <FormAddFriend />}
+        {isOpenFormAddFriend && (
+          <FormAddFriend onAddFriend={handleAddFriend} />
+        )}
         <Button onClick={() => setIsOpenFormAddFriend(!isOpenFormAddFriend)}>
           {isOpenFormAddFriend ? 'Close' : 'Add friend'}
         </Button>
       </div>
-      {formSplitBillId && <FormSplitBill currentFriendName={currentFriendName} />}
+      {formSplitBillId && (
+        <FormSplitBill currentFriendName={currentFriendName} />
+      )}
     </div>
   );
 }
@@ -97,28 +108,62 @@ function Friend({ friend, formSplitBillId, onToggleFormSplitBill }) {
   );
 }
 
-function FormAddFriend() {
+function FormAddFriend({ onAddFriend }) {
+  const [friendName, setFriendName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('https://i.pravatar.cc/48');
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!friendName || !avatarUrl) return;
+    const id = crypto.randomUUID();
+    onAddFriend({
+      id,
+      name: friendName,
+      image: `${avatarUrl}?u=${id}`,
+      balance: 0,
+    });
+    setFriendName('');
+    setAvatarUrl('https://i.pravatar.cc/48');
+  }
   return (
-    <form className="form-add-friend">
+    <form className="form-add-friend" onSubmit={handleSubmit}>
       <label>👬 Friend's name</label>
-      <input type="text" />
+      <input
+        type="text"
+        value={friendName}
+        onChange={(e) => setFriendName(e.target.value)}
+      />
       <label>📷 Image URL</label>
-      <input type="url" />
+      <input
+        type="url"
+        value={avatarUrl}
+        onChange={(e) => setAvatarUrl(e.target.value)}
+      />
       <Button>Add</Button>
     </form>
   );
 }
 
 function FormSplitBill({ currentFriendName }) {
+  const [totalBill, setTotalBill] = useState('');
+  const [yourExpense, setYourExpense] = useState('');
+  const yourFriendExpense = totalBill && yourExpense && totalBill - yourExpense;
   return (
     <form className="form-split-bill">
       <h2>Split the bill with ?</h2>
-      <label>💰 Bill value</label>
-      <input type="number" />
+      <label>💰 Total bill value</label>
+      <input
+        type="number"
+        value={totalBill}
+        onChange={(e) => setTotalBill(Number(e.target.value))}
+      />
       <label>🧍‍♂️ Your expense</label>
-      <input type="number" />
+      <input
+        type="number"
+        value={yourExpense}
+        onChange={(e) => setYourExpense(Number(e.target.value))}
+      />
       <label>👭 {currentFriendName}'s expense</label>
-      <input type="number" disabled />
+      <input type="number" disabled value={yourFriendExpense} />
       <label>🤑 Who is paying the bill?</label>
       <select>
         <option>You</option>
