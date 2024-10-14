@@ -67,7 +67,6 @@ function App() {
           : friend;
       })
     );
-    setFormSplitBillId(null);
   }
 
   return (
@@ -183,6 +182,7 @@ function FormSplitBill({ friends, currentFriendId, onUpdateBalance }) {
     onUpdateBalance(currentFriendId, newBalance);
     setTotalBill('');
     setYourExpense('');
+    setPersonPayBill('you');
   }
   return (
     <form className="form-split-bill" onSubmit={handleSubmit}>
